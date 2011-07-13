@@ -1,18 +1,45 @@
 <?php
 
 class productRecallApi extends APIBaseClass{
-	// supports json only... don't include format, _request should handle it
-	
-	// api_key , query, start_date , end_date , organization, upc, sort , code, make, model, year, page
-	
 	public static $api_url = 'http://search.usa.gov/search/recalls';
+	
+	// php disallows use of 'sort' as a object parameter name since it is already a common library function name
+	public static $param = array('organization'=>'','upc'=>'','sort_by'=>'','code'=>'','make'=>'','model'=>'','year'=>'');
 	
 	public function __construct($url=NULL)
 	{
 		parent::new_request(($url?$url:self::$api_url));
 	}
+	public function set_option($option,$value){
+		if(array_key_exists($option,self::$param))
+			$this->$option =$value;
+	}
+	// or old school calling
+	public function set_org($org){$this->organization = $org;}
 	
+	public function set_sort($sort_type){ 	$this->sort_by = $sort_type; }
+	
+	public function set_make($make){		$this->make = $make;		 }
+	
+	public function set_model($model){		$this->model = $model;		 }
+	
+	public function set_year($year){		$this->year = $year;		 }
+	
+	public function set_code($code){		$this->code = $code;		 }
+	
+	public function set_date($start,$stop=NULL){
+	// not to say that start = null is impossible
+	// maye want to see that it conforms to the desired timestamp, if not possibly convert it
+		$this->start_date = $start;
+		if($stop != NULL) $this->end_date = $stop;
+	}
+
+	public function upc_lookup(){
+	
+	}	
+
 	public function get_recall_data($query,$start_date,$end_date,$options=NULL,$page=1){
+	// check if any object params are set, and if so remove start_date end_date etc.
 	// ideally some options should be required but documentation doesn't make which ones those are clear
 	/*	Product Recall Data API
 		Parameters:
@@ -44,19 +71,23 @@ class productRecallApi extends APIBaseClass{
 		    page: Pagination of search results. Ten results are displayed on each search results page. Paginate search results pages by adding '&page=#' to the query string.
 		        Example: http://search.usa.gov/search/recalls?format=json&page=3
 	*/
-	
 		$data['format'] = 'json';
 		$data['page'] = $page;
-		$data['start_date'] = $start_date;
-		$data['end_date'] = $end_date;
+		// check for object params
+		if(count(get_object_vars($this)) > 2){
+			foreach(get_object_vars($this) as $var=>$value)
+				;
+		// should only have two object variables, the api url and the params
+		}else{
+			$data['start_date'] = $start_date;
+			$data['end_date'] = $end_date;
+		}
 		
 		$data = array_merge($data,array_intersect_key($options,array('organization'=>'','upc'=>'','sort'=>'','code'=>'','make'=>'','model'=>'','year'=>''))
 	);
 		
-		// use some kind of array intersects function
-
 	return $this->_request($path."$query", 'get' ,$data) ;
 
 	}
 	
-	}
+}
