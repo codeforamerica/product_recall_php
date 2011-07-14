@@ -10,6 +10,18 @@ class productRecallApi extends APIBaseClass{
 	{
 		parent::new_request(($url?$url:self::$api_url));
 	}
+	
+	/* this api has a lot of options.. so I added an object oriented style of building queries,
+	
+	  that can be accessed two ways, set_option(option,value) or
+	  
+	  set_**option name** ($value)
+	  
+	  set_date(start date, end date)
+	  
+	  When you're ready to make your query simply call recall_data() or recall_data('search query');
+	  
+	*/
 	public function set_option($option,$value){
 		if(array_key_exists($option,self::$param))
 			$this->$option =$value;
@@ -34,9 +46,29 @@ class productRecallApi extends APIBaseClass{
 		if($stop != NULL) $this->end_date = $stop;
 	}
 
-	public function upc_lookup(){
+	public function recall_data($query=''){
+	// step one check for extra options
+	// this needs testing ...
 	
-	}	
+	
+	// we count the total number of object vars, to see if any non default vars have been added to the class,
+	// and compare against the count of get_class_vars - which returns an assoc. array of the default class values
+		if(count(get_object_vars($this)) > count(get_class_vars())){
+			foreach(get_object_vars($this) as $var=>$value)
+				if(array_key_exists($var,self::$param) && !$data[$var])
+					if($var == 'sort_by')
+						$data['sort'] = $value;
+					else
+						$data[$var] = $value;
+			if($data) {
+				$data['format'] = 'json';
+				return $this->_request($path."$query", 'get' ,$data) ;
+				
+			}
+	
+		}
+	}
+
 
 	public function get_recall_data($query,$start_date,$end_date,$options=NULL,$page=1){
 	// check if any object params are set, and if so remove start_date end_date etc.
@@ -74,14 +106,10 @@ class productRecallApi extends APIBaseClass{
 		$data['format'] = 'json';
 		$data['page'] = $page;
 		// check for object params
-		if(count(get_object_vars($this)) > 2){
-			foreach(get_object_vars($this) as $var=>$value)
-				;
-		// should only have two object variables, the api url and the params
-		}else{
-			$data['start_date'] = $start_date;
-			$data['end_date'] = $end_date;
-		}
+	
+		$data['start_date'] = $start_date;
+		$data['end_date'] = $end_date;
+	
 		
 		$data = array_merge($data,array_intersect_key($options,array('organization'=>'','upc'=>'','sort'=>'','code'=>'','make'=>'','model'=>'','year'=>''))
 	);
