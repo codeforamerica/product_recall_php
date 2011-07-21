@@ -110,11 +110,11 @@ class productRecallApi extends APIBaseClass{
 		$data['start_date'] = $start_date;
 		$data['end_date'] = $end_date;
 	
-		
+		if(is_array($options))
 		$data = array_merge($data,array_intersect_key($options,array('organization'=>'','upc'=>'','sort'=>'','code'=>'','make'=>'','model'=>'','year'=>''))
 	);
 		
-	return $this->_request($path."$query", 'get' ,$data) ;
+	return $this->_request($path."$query", 'GET' ,$data) ;
 
 	}
 	
