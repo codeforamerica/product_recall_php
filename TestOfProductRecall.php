@@ -13,6 +13,8 @@ class TestOfApiClass extends UnitTestCase {
     function testApiConstructs(){
     	$this->api = new self::$class_name();
     	$this->check_class_params('_http _root api_url');
+    	$this->assertTrue($this->api->get_recall_data(NULL,'2010-01-01','2010-03-19'));
+    	$this->assertTrue($this->api->get_recall_data('tires','2010-01-01','2010-03-19'));
     }
 
     function check_class_params($params=NULL,$mode=TRUE){
@@ -39,4 +41,3 @@ class TestOfApiClass extends UnitTestCase {
     }
 }
 ?>
-
