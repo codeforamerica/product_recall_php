@@ -62,7 +62,7 @@ class productRecallApi extends APIBaseClass{
 						$data[$var] = $value;
 			if($data) {
 				$data['format'] = 'json';
-				return $this->_request($path."$query", 'get' ,$data) ;
+				return $this->_request(self::$api_url."$query", 'get' ,$data) ;
 				
 			}
 	
@@ -114,7 +114,7 @@ class productRecallApi extends APIBaseClass{
 		$data = array_merge($data,array_intersect_key($options,array('organization'=>'','upc'=>'','sort'=>'','code'=>'','make'=>'','model'=>'','year'=>''))
 	);
 		
-	return $this->_request($path."$query", 'GET' ,$data) ;
+	return $this->_request(self::$api_url."$query", 'GET' ,$data) ;
 
 	}
 	
